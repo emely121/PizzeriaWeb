@@ -1,0 +1,57 @@
+@model PizzeriaWeb.ViewModels.CatalogoViewModel
+@{
+    ViewData["Title"] = "Menú";
+}
+
+<div class="text-center mb-4">
+    <h1 class="display-6">Nuestro menú</h1>
+    <p class="text-muted">Pizzas, bebidas, extras y combos</p>
+</div>
+
+<form method="get" asp-action="Index" class="row g-2 mb-4">
+    <div class="col-md-6">
+        <input type="search" name="q" value="@Model.Busqueda" class="form-control"
+               placeholder="Buscar pizza, bebida o extra..." />
+    </div>
+    <div class="col-md-4">
+        <select name="categoriaId" class="form-select">
+            <option value="">Todas las categorías</option>
+            @foreach (var c in Model.Categorias)
+            {
+                <option value="@c.Id" selected="@(Model.CategoriaId == c.Id)">@c.Nombre</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2 d-grid">
+        <button type="submit" class="btn btn-danger">Buscar</button>
+    </div>
+</form>
+
+@if (Model.MasVendidos.Count > 0)
+{
+    <h2 class="h4 mb-3">Lo más vendido</h2>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3 mb-4">
+        @foreach (var p in Model.MasVendidos)
+        {
+            <partial name="_ProductoCard" model="p" />
+        }
+    </div>
+}
+
+@if (Model.Productos.Count == 0)
+{
+    <div class="alert alert-secondary text-center">No se encontraron productos con ese criterio.</div>
+}
+else
+{
+    @foreach (var grupo in Model.Productos.GroupBy(p => p.Categoria))
+    {
+        <h2 class="h4 mt-4 mb-3">@grupo.Key</h2>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3">
+            @foreach (var p in grupo)
+            {
+                <partial name="_ProductoCard" model="p" />
+            }
+        </div>
+    }
+}
